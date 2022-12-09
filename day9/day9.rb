@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-require 'pry'
 require './point'
 
 class Head < Point
@@ -25,11 +24,12 @@ class Tail < Point
 end
 
 class InputParser
-  attr_reader :head, :tail, :input
+  attr_reader :head, :tail, :tails_b, :input
 
-  def initialize(head, tail, input)
+  def initialize(head, tail, tails_b, input)
     @head = head
     @tail = tail
+    @tails_b = tails_b
     @input = input
   end
 
@@ -52,12 +52,20 @@ class InputParser
       @head.move_by(y: -1)
     end
     @tail.follow_head(@head)
+
+    # Part B
+    @tails_b[0].follow_head(@head)
+    (1...(@tails_b.count)).each do |idx|
+      @tails_b[idx].follow_head(@tails_b[idx - 1])
+    end
   end
 end
 
 head = Head.new
 tail = Tail.new
+tails = 9.times.map { Tail.new }
 input = File.readlines('input.txt').map(&:chomp)
-ip = InputParser.new(head, tail, input)
+ip = InputParser.new(head, tail, tails, input)
 ip.analyze!
 puts "Part A: #{tail.all_points.count}"
+puts "Part B: #{tails.last.all_points.count}"
